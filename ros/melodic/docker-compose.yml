@@ -1,0 +1,44 @@
+services:
+  ros:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        USERNAME: "${USER}"
+        USER_UID: "${UID}"
+        USER_GID: "${GID}"
+        USER_HOME_DIR: "${HOME}"
+    container_name: ros_melodic_0
+    network_mode: "host"
+    # ports:
+    #   - "8082:8080"
+
+    # Enabling GPU access with Compose
+    # https://docs.docker.com/compose/gpu-support/
+    deploy:
+      resources:
+        reservations:
+          devices:
+             - capabilities: [gpu]
+               count: all
+
+    environment:
+      # Set a fancy prompt (See ~/.bashrc in the container)
+      - TERM=xterm-256color
+
+      # WSLg settings
+      # https://www.reddit.com/r/bashonubuntuonwindows/comments/n2nthu/can_i_use_the_new_wslg_with_docker/
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY
+      - XDG_RUNTIME_DIR
+      - PULSE_SERVER
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+    volumes:
+      - ${HOME}:${HOME}
+
+      # WSLg settings
+      - /mnt/wslg:/mnt/wslg
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+    privileged: true

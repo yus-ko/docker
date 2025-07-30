@@ -1,0 +1,14 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      args:
+        USERNAME: "${USER}"
+        USER_UID: "${UID}"
+        USER_GID: "${GID}"
+    environment:
+      - HOME=/home/${USER}
+    volumes:
+      - .:/workspace
+    tty: true
