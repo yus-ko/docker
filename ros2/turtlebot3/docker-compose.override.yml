@@ -1,0 +1,10 @@
+services:
+  ros-humble-turtlebot3:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              count: all
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=all
