@@ -28,7 +28,8 @@ RUN apt update && apt install -y \
     ros-humble-rqt-* \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup \
-    ros-humble-turtlebot3-gazebo && \
+    ros-humble-turtlebot3-gazebo \
+    ros-humble-turtlebot3-navigation2 && \
     rm -rf /var/lib/apt/lists/*
 
 # RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
