@@ -1,2 +1,8 @@
 .env
 ros2-gazebo-docker
+isaac-sim
+isaac-sim/cache
+isaac-sim/config
+isaac-sim/data
+isaac-sim/logs
+isaac-sim/pkg
