@@ -1,0 +1,23 @@
+FROM ros:jazzy
+
+RUN apt-get update && apt-get install -y \
+    sudo \
+    passwd \
+    curl \
+    vim \
+    x11-apps \
+    wget \
+    tmux \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    python3-colcon-common-extensions \
+    ros-jazzy-ackermann-msgs \
+    ros-jazzy-navigation2 \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-pointcloud-to-laserscan \
+    ros-jazzy-moveit \
+    ros-jazzy-rqt-* \
+    && rm -rf /var/lib/apt/lists/*
+
+CMD ["bash"]

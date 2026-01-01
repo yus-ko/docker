@@ -23,8 +23,19 @@ RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-inf
 RUN apt-get update && apt-get install -y \
     ros-jazzy-desktop \
     python3-colcon-common-extensions \
+    ros-jazzy-ackermann-msgs \
+    ros-jazzy-navigation2 \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-pointcloud-to-laserscan \
+    ros-jazzy-moveit \
     ros-jazzy-rqt-* \
     && rm -rf /var/lib/apt/lists/*
+
+RUN cd /workspace && \
+    git clone -b IsaacSim-5.1.0 https://github.com/isaac-sim/IsaacSim-ros_workspaces.git && \
+    cd /workspace/IsaacSim-ros_workspaces/jazzy_ws/ && \
+    source /opt/ros/jazzy/setup.bash && \
+    colcon build
 
 # ARG USERNAME
 # ARG USER_UID

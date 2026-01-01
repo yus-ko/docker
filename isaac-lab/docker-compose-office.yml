@@ -42,7 +42,7 @@ services:
     command: "ros2 launch isaacsim run_isaacsim.launch.py \
                 install_path:=/isaac-sim \
                 play_sim_on_start:=true \
-                gui:=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/multiple_robot_carter_hospital_navigation.usd"
+                gui:=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/multiple_robot_carter_office_navigation.usd"
 
   isaac_ros2_ws:
     <<: *common_setting
@@ -51,4 +51,4 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime"
     container_name: ros2_ws
-    command: "ros2 launch carter_navigation multiple_robot_carter_navigation_hospital.launch.py"
+    command: "ros2 launch carter_navigation multiple_robot_carter_navigation_office.launch.py"
