@@ -10,10 +10,7 @@ x-common-setting: &common_setting
   network_mode: "bridge"
   stdin_open: true
   tty: true
-  entrypoint: bash -c "source /opt/ros/jazzy/setup.bash && \
-                        source /workspace/IsaacSim-ros_workspaces/jazzy_ws/install/setup.bash && \
-                        exec \"$@\"" 
-              ros-entrypoint
+  entrypoint: bash
 
 services:
   isaac_lab_ros2:
@@ -39,16 +36,3 @@ services:
              - capabilities: [gpu]
                count: all
     user: 1234:1234
-    command: "ros2 launch isaacsim run_isaacsim.launch.py \
-                install_path:=/isaac-sim \
-                play_sim_on_start:=true \
-                gui:=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/multiple_robot_carter_hospital_navigation.usd"
-
-  isaac_ros2_ws:
-    <<: *common_setting
-    environment: *common_env
-    volumes: 
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - /etc/localtime:/etc/localtime"
-    container_name: ros2_ws
-    command: "ros2 launch carter_navigation multiple_robot_carter_navigation_hospital.launch.py"

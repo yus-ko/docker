@@ -3,21 +3,33 @@ x-common-env: &common_env
   TERM: ${TERM}
 
 x-common-setting: &common_setting
+  network_mode: "bridge"
+  stdin_open: true
+  tty: true
+
+x-gpu-setting: &gpu_setting
+  deploy:
+    resources:
+      reservations:
+        devices:
+            - capabilities: [gpu]
+              count: all
+
+x-common-image: &common_image
   build:
     context: .
     dockerfile: ./Dockerfile
   image: isaac-lab-ros2-custom
-  network_mode: "bridge"
-  stdin_open: true
-  tty: true
+
+x-common-entrypoint: &common_entrypoint
   entrypoint: bash -c "source /opt/ros/jazzy/setup.bash && \
                         source /workspace/IsaacSim-ros_workspaces/jazzy_ws/install/setup.bash && \
                         exec \"$@\"" 
               ros-entrypoint
-
+  
 services:
   isaac_lab_ros2:
-    <<: *common_setting
+    <<: [*common_image, *common_setting, *common_entrypoint, *gpu_setting]
     environment: 
       <<: *common_env
       ACCEPT_EULA: Y
@@ -29,26 +41,36 @@ services:
       - ~/docker/isaac-sim/config:/isaac-sim/.nvidia-omniverse/config:rw
       - ~/docker/isaac-sim/data:/isaac-sim/.local/share/ov/data:rw
       - ~/docker/isaac-sim/pkg:/isaac-sim/.local/share/ov/pkg:rw
+      - ./resources:/resources
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime
     container_name: isaac-deploy
-    deploy:
-      resources:
-        reservations:
-          devices:
-             - capabilities: [gpu]
-               count: all
     user: 1234:1234
     command: "ros2 launch isaacsim run_isaacsim.launch.py \
                 install_path:=/isaac-sim \
                 play_sim_on_start:=true \
-                gui:=https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Samples/ROS2/Scenario/multiple_robot_carter_office_navigation.usd"
+                gui:=/resources/multiple_robot_carter_hospital_navigation.usd"
 
   isaac_ros2_ws:
-    <<: *common_setting
+    <<: [*common_image, *common_setting, *common_entrypoint]
     environment: *common_env
     volumes: 
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime
-    container_name: ros2_ws
-    command: "ros2 launch carter_navigation multiple_robot_carter_navigation_office.launch.py"
+    container_name: navigation
+    command: "ros2 launch carter_navigation multiple_robot_carter_navigation_hospital.launch.py"
+
+  glim:
+    <<: [*common_setting, *gpu_setting]
+    image: koide3/glim_ros2:humble_cuda12.2
+    container_name: glim
+    environment: *common_env
+    volumes: 
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /etc/localtime:/etc/localtime
+      - ./glim/configs/carter:/glim/config
+      - ./glim/dumps/latest:/tmp/dump
+    command: "ros2 run glim_ros glim_rosnode \
+                --ros-args -p config_path:=/glim/config \
+                --remap /os_cloud_node/imu:=/carter1/chassis/imu \
+                --remap /os_cloud_node/points:=/carter1/front_3d_lidar/lidar_points"

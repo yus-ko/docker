@@ -25,3 +25,31 @@ docker run --name isaac-sim --entrypoint bash -it --gpus all --rm --network=host
 ```
 docker compose up -d
 ```
+
+isaac-sim起動
+```
+docker exec -it isaac-deploy bash
+runapp
+```
+
+## 使用例
+
+単体ナビゲーション（倉庫）
+```
+docker compose -f docker-compose-warehouse.yml up -d
+```
+
+複数台ナビゲーション（病院）
+```
+docker compose -f docker-compose-hospital.yml up -d
+```
+
+複数台ナビゲーション（オフィス）
+```
+docker compose -f docker-compose-office.yml up -d
+```
+
+glimを使用した3D-SLAM
+```
+docker compose -f docker-compose-glim.yml up -d
+```

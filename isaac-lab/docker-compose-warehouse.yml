@@ -33,17 +33,15 @@ services:
       - /etc/localtime:/etc/localtime
     user: 1234:1234
     # privileged: true
-    entrypoint: bash -c "source /opt/ros/jazzy/setup.bash && \
+    entrypoint: bash -c "cd /isaac-sim && \
+                        ln -s /isaac-sim isaacsim && \
+                        source /opt/ros/jazzy/setup.bash && \
                         source /workspace/IsaacSim-ros_workspaces/jazzy_ws/install/setup.bash && \
                         exec \"$@\"" 
                 ros-entrypoint
     stdin_open: true
     tty: true
-    command: -c "cd /isaac-sim && \
-                ln -s /isaac-sim isaacsim && \
-                source /opt/ros/jazzy/setup.bash && \
-                source /workspace/IsaacSim-ros_workspaces/jazzy_ws/install/setup.bash && \
-                ros2 launch carter_navigation carter_navigation_isaacsim.launch.py"
+    command: "ros2 launch carter_navigation carter_navigation_isaacsim.launch.py"
 
   # isaac_ros2_ws:
   #   # build:
