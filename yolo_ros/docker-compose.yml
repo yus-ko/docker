@@ -1,0 +1,43 @@
+x-camera-setting: &camera_setting
+  build:
+    context: .
+    dockerfile: ./Dockerfile
+  image: ros/camera:humble
+  network_mode: bridge
+  environment:
+    - TERM=$TERM
+    - DISPLAY=$DISPLAY
+  stdin_open: true
+  tty: true
+
+services:
+  camera:
+    <<: *camera_setting
+    container_name: camera
+    devices:
+      - /dev/video0:/dev/video0:mwr
+    command: ros2 run usb_cam usb_cam_node_exe --ros-args --remap image_raw:=camera/rgb/image_raw
+    
+  rviz2:
+    <<: *camera_setting
+    container_name: rviz2
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./yolo.rviz:/yolo.rviz
+    command: rviz2 -d /yolo.rviz
+
+  yolo_ros:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.yolo
+    image: yolo_ros
+    network_mode: bridge
+    container_name: yolo_ros
+    deploy:
+      resources:
+        reservations:
+          devices:
+              - capabilities: [gpu]
+                count: all
+    command: bash -c "source /root/ros2_ws/install/setup.bash && ros2 launch yolo_bringup yolo.launch.py"
+    
