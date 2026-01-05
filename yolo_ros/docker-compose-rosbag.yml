@@ -1,0 +1,46 @@
+x-camera-setting: &camera_setting
+  build:
+    context: .
+    dockerfile: ./Dockerfile
+  image: ros/camera:humble
+  network_mode: bridge
+  environment:
+    - TERM=$TERM
+    - DISPLAY=$DISPLAY
+  stdin_open: true
+  tty: true
+
+services:
+
+  rosbag:
+    image: ros:jazzy
+    container_name: rosbag
+    network_mode: bridge
+    volumes:
+      - ./rosbag:/rosbag
+    command: ros2 bag play /rosbag/image -r 1 -l
+    
+  rviz2:
+    <<: *camera_setting
+    container_name: rviz2
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./yolo.rviz:/yolo.rviz
+    command: rviz2 -d /yolo.rviz
+
+  yolo_ros:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.yolo
+    image: yolo_ros
+    network_mode: bridge
+    container_name: yolo_ros
+    deploy:
+      resources:
+        reservations:
+          devices:
+              - capabilities: [gpu]
+                count: all
+    command: bash -c "source /root/ros2_ws/install/setup.bash && ros2 launch yolo_bringup yolo.launch.py model:=yolov8m-pose.pt input_image_topic:=/rgb_right input_depth_topic:=/depth_right input_depth_info_topic:=/camera_info_right depth_image_units_divisor:=1 target_frame:=carter_camera_stereo_right use_3d:=True"
+    # command: bash -c "source /root/ros2_ws/install/setup.bash && ros2 launch yolo_bringup yolov8.launch.py use_3d:=True"
+    
